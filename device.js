@@ -103,4 +103,4 @@ function getDeviceInformation(host, dataType = 1){
 }
 
 
-exports.device = getDeviceInformation;
+exports.info = getDeviceInformation;

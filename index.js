@@ -1,4 +1,5 @@
 const server = require("./server");
-const my = require("./device");
+const device = require("./device");
 
-my.device('10.170.80.156');
+//device.info('10.170.80.156');
+server.start();
