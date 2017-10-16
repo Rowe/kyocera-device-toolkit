@@ -1,21 +1,57 @@
+require('ssl-root-cas').inject();
 const http = require('http');
-const net = require('net');
-const url = require('url');
-const util = require('util');
+const https = require('https');
 const parseString = require('xml2js').parseString;
 
 
-/**
- * get device informaiton
- * @param host
- *  ip address or a correct host name
- * @param type
- *  type :1 raw data
- *  type :2 json
- */
-function getDeviceInformation(host, dataType = 1){
-    var port = 9090;
-    var hostIp = host;
+function responseHandler(res) {
+    console.log(`STATUS: ${res.statusCode}`);
+    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+    if (res.statusCode == 307) {
+        request('10.170.80.151', 9091, https);
+        return;
+    }
+
+
+    var responseXML = "";
+    statusCode = res.statusCode;
+
+
+    res.setEncoding('utf8');
+    res.on('data', (chunk) => {
+        responseXML += chunk;
+    });
+    res.on('end', () => {
+        // console.log(responseXML);
+        // console.log('No more data in response.');
+
+        parseString(responseXML, function (err, result) {
+            // result = util.inspect(result, false, null);
+            //console.dir('--------------------------------soap object-----------------------------------');
+            //console.dir(result);
+
+            //console.dir('--------------------------------printer panel---------------------------------');
+            const statustring = result['SOAP-ENV:Envelope']
+                ['SOAP-ENV:Body']
+                [0]
+                ['kmdevinfo:get_device_constitution_informationResponse']
+                [0]
+                ['kmdevinfo:information']
+                [0]
+                ['kmdevinfo:panel_information']
+                [0]
+                ['kmdevinfo:message']
+                [0];
+            console.dir(
+                statustring
+            );
+        });
+    });
+}
+
+
+function request(host, port, obj) {
+
     const postData =
         '<?xml version="1.0" encoding="UTF-8" ?>\n' +
         '                <SOAP-ENV:Envelope\n' +
@@ -35,7 +71,7 @@ function getDeviceInformation(host, dataType = 1){
         '                    xmlns:wsa="http://www.w3.org/2005/08/addressing"\n' +
         '                    xmlns:kmdevinf="http://www.kyoceramita.com/ws/km-wsdl/information/device_information">\n' +
         '                    <SOAP-ENV:Header>\n' +
-        '                    <wsa:To>http://' + hostIp + ':' + port + '/ws/km-wsdl/information/device_information</wsa:To>\n' +
+        '                    <wsa:To>http://' + host + ':' + port + '/ws/km-wsdl/information/device_information</wsa:To>\n' +
         '                    <wsa:Action>http://www.kyoceramita.com/ws/km-wsdl/information/device_information/get_device_constitution_information</wsa:Action>\n' +
         '                    </SOAP-ENV:Header>\n' +
         '                    <SOAP-ENV:Body>\n' +
@@ -45,61 +81,42 @@ function getDeviceInformation(host, dataType = 1){
         '                    </SOAP-ENV:Envelope>';
 
     const options = {
-        host: hostIp,
+        host: host,
         port: port,
         method: 'POST',
+        strictSSL: false,
+        rejectUnauthorized: false,
         path: '/ws/km-wsdl/information/device_information',
         headers: {
-            'Host': '' + hostIp + ':' + port,
+            'Host': '' + host + ':' + port,
             'Content-Type': 'application/soap+xml; charset=utf-8; action="http://www.kyoceramita.com/ws/km-wsdl/information/device_information/get_device_constitution_information"',
             'Connection': 'close',
             'KMDEVINF_SOAPAction': 'http://www.kyoceramita.com/ws/km-wsdl/information/device_information/get_device_constitution_information',
         }
     };
 
-    var responseXML = "";
-    const req = http.request(options, (res) => {
-        console.log(`STATUS: ${res.statusCode}`);
-        console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-        res.setEncoding('utf8');
-        res.on('data', (chunk) => {
-
-            responseXML += chunk;
-
-        });
-        res.on('end', () => {
-            // console.log(responseXML);
-            // console.log('No more data in response.');
-
-            parseString(responseXML, function (err, result) {
-                // result = util.inspect(result, false, null);
-                console.dir('--------------------------------soap object-----------------------------------');
-                console.dir(result);
-
-                console.dir('--------------------------------printer panel---------------------------------');
-                console.dir(
-                    result['SOAP-ENV:Envelope']
-                        ['SOAP-ENV:Body']
-                        [0]
-                        ['kmdevinfo:get_device_constitution_informationResponse']
-                        [0]
-                        ['kmdevinfo:information']
-                        [0]
-                        ['kmdevinfo:panel_information']
-                );
-
-            });
-
-        });
-    });
-
+    const req = obj.request(options, responseHandler);
     req.on('error', (e) => {
         console.error(`problem with request: ${e.message}`);
     });
 
 // write data to request body
     req.write(postData);
+
     req.end();
+}
+
+
+/**
+ * get device informaiton
+ * @param host
+ *  ip address or a correct host name
+ * @param type
+ *  type :1 raw data
+ *  type :2 json
+ */
+function getDeviceInformation(host, port = 9090, dataType = 1) {
+    request(host, port, http);
 }
 
 

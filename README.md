@@ -1,1 +1,1 @@
-# KYOCERA Printer API Node version
+# KYOCERA MFP API Node version

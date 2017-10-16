@@ -1,13 +1,21 @@
-var http = require('http');
+const http = require('http');
+const url = require('url');
+const querystring = require('querystring');
+const device = require("./device");
 
-
-function start(){
+function start() {
     http.createServer(function (request, response) {
 
-        if (request.method === 'GET' && request.url === '/echo') {
+        if (request.method === 'GET') {
+
+            var requestURL = url.parse(request.url);
+            strObj = querystring.parse(requestURL.query);
+
+            console.dir(strObj);
             response.write('<html>');
             response.write('<body>');
             response.write('<h1>Hello, World!</h1>');
+
             response.write('</body>');
             response.write('</html>');
             response.end();
@@ -17,9 +25,5 @@ function start(){
         }
     }).listen(8888);
 }
-
-
-
-console.log('Server running at http://127.0.0.1:8888/');
 
 exports.start = start;
