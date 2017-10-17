@@ -1,57 +1,4 @@
-const http = require('http');
-const https = require('https');
-const parseString = require('xml2js').parseString;
-
-
-function responseHandler(res) {
-    console.log(`STATUS: ${res.statusCode}`);
-    console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-    if (res.statusCode == 307) {
-        request('10.170.80.151', 9091, https);
-        return;
-    }
-
-
-    var responseXML = "";
-    statusCode = res.statusCode;
-
-
-    res.setEncoding('utf8');
-    res.on('data', (chunk) => {
-        responseXML += chunk;
-    });
-    res.on('end', () => {
-        // console.log(responseXML);
-        // console.log('No more data in response.');
-
-        parseString(responseXML, function (err, result) {
-            // result = util.inspect(result, false, null);
-            //console.dir('--------------------------------soap object-----------------------------------');
-            //console.dir(result);
-
-            //console.dir('--------------------------------printer panel---------------------------------');
-            const statustring = result['SOAP-ENV:Envelope']
-                ['SOAP-ENV:Body']
-                [0]
-                ['kmdevinfo:get_device_constitution_informationResponse']
-                [0]
-                ['kmdevinfo:information']
-                [0]
-                ['kmdevinfo:panel_information']
-                [0]
-                ['kmdevinfo:message']
-                [0];
-            console.dir(
-                statustring
-            );
-            return statustring;
-        });
-    });
-}
-
-
-function request(host, port, obj) {
-
+function request(host, ip, callback) {
     const postData =
         '<?xml version="1.0" encoding="UTF-8" ?>\n' +
         '                <SOAP-ENV:Envelope\n' +
@@ -93,30 +40,6 @@ function request(host, port, obj) {
             'KMDEVINF_SOAPAction': 'http://www.kyoceramita.com/ws/km-wsdl/information/device_information/get_device_constitution_information',
         }
     };
-
-    const req = obj.request(options, responseHandler);
-    req.on('error', (e) => {
-        console.error(`problem with request: ${e.message}`);
-    });
-
-// write data to request body
-    req.write(postData);
-
-    req.end();
 }
 
 
-/**
- * get device informaiton
- * @param host
- *  ip address or a correct host name
- * @param type
- *  type :1 raw data
- *  type :2 json
- */
-function getDeviceInformation(host, port = 9090, dataType = 1) {
-    return request(host, port, http);
-}
-
-
-exports.info = getDeviceInformation;

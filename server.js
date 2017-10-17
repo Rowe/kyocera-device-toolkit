@@ -3,15 +3,20 @@ const url = require('url');
 const querystring = require('querystring');
 const device = require("./device");
 
-function start() {
-    http.createServer(function (request, response) {
+function start(route) {
 
+    function onRequest(request, response) {
         if (request.method === 'GET') {
 
             var requestURL = url.parse(request.url);
-            strObj = querystring.parse(requestURL.query);
+            params = querystring.parse(requestURL.query);
 
-            console.dir(strObj);
+            if (params.host != undefined) {
+                console.dir(params);
+                console.dir((function () {
+                    device.info('10.170.80.151')
+                })());
+            }
             response.write('<html>');
             response.write('<body>');
             response.write('<h1>Hello, World!</h1>');
@@ -23,7 +28,9 @@ function start() {
             response.statusCode = 404;
             response.end();
         }
-    }).listen(8888);
+    }
+
+    http.createServer(onRequest).listen(8888);
 }
 
 exports.start = start;
