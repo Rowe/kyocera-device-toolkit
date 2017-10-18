@@ -19,7 +19,7 @@ function start(route) {
                     });
                 }
                 if (params.action == 'tonerinfo') {
-                    soapRequest.getPanelInfo(params.host, function (res) {
+                    soapRequest.getTonerInfo(params.host, function (res) {
                         response.write(res);
                         response.end();
                     });
