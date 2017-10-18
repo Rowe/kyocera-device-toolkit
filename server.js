@@ -1,7 +1,7 @@
 const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
-const device = require("./device");
+const soapRequest = require('./soap/soap_request');
 
 function start(route) {
 
@@ -12,18 +12,19 @@ function start(route) {
             params = querystring.parse(requestURL.query);
 
             if (params.host != undefined) {
-                console.dir(params);
-                console.dir((function () {
-                    device.info('10.170.80.151')
-                })());
+                if (params.action == 'panelinfo') {
+                    soapRequest.getPanelInfo(params.host, function (res) {
+                        response.write(res);
+                        response.end();
+                    });
+                }
+                if (params.action == 'tonerinfo') {
+                    soapRequest.getPanelInfo(params.host, function (res) {
+                        response.write(res);
+                        response.end();
+                    });
+                }
             }
-            response.write('<html>');
-            response.write('<body>');
-            response.write('<h1>Hello, World!</h1>');
-
-            response.write('</body>');
-            response.write('</html>');
-            response.end();
         } else {
             response.statusCode = 404;
             response.end();

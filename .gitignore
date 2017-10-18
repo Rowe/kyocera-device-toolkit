@@ -111,3 +111,4 @@ typings/
 .env
 
 
+/wireshark_package/*
