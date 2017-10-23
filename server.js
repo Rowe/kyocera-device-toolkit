@@ -32,6 +32,12 @@ function start(route) {
                         soapRequest.getDeviceCounter(params.host, function (res) {
                             onResponse(res, response);
                         });
+                        break;
+                    case 'auth_sta':
+                        soapRequest.getAuthenticationStatus(params.host, function (res) {
+                            onResponse(res, response);
+                        });
+                        break;
                     default:
                         break;
                 }

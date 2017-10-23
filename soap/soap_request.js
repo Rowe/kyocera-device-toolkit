@@ -22,7 +22,11 @@ function getRequestOptions(host, port, path, action) {
 }
 
 function getAuthenticationStatus(host, callback){
-
+    const options = getRequestOptions(host, 9090, device_authentication.path, device_authentication.get_authentication_status_action);
+    const postData = device_authentication.get_authentication_status_body;
+    request.post(options, postData, function (soapBody) {
+        callback(JSON.stringify(soapBody));
+    });
 }
 
 function getDeviceInfo(host, callback) {
@@ -64,3 +68,4 @@ exports.getPanelInfo = getPanelInfo;
 exports.getTonerInfo = getTonerInfo;
 exports.getCassetteInfo = getCassetteInfo;
 exports.getDeviceCounter = getDeviceCounter;
+exports.getAuthenticationStatus = getAuthenticationStatus;
