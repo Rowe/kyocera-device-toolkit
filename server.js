@@ -12,18 +12,30 @@ function start(route) {
             params = querystring.parse(requestURL.query);
 
             if (params.host != undefined) {
-                if (params.action == 'panelinfo') {
-                    soapRequest.getPanelInfo(params.host, function (res) {
-                        response.write(res);
-                        response.end();
-                    });
+                switch (params.action) {
+                    case 'panel':
+                        soapRequest.getPanelInfo(params.host, function (res) {
+                            onResponse(res, response);
+                        });
+                        break;
+                    case 'tonner':
+                        soapRequest.getTonerInfo(params.host, function (res) {
+                            onResponse(res, response);
+                        });
+                        break;
+                    case 'cassette':
+                        soapRequest.getCassetteInfo(params.host, function (res) {
+                            onResponse(res, response);
+                        });
+                        break;
+                    case 'counter':
+                        soapRequest.getDeviceCounter(params.host, function (res) {
+                            onResponse(res, response);
+                        });
+                    default:
+                        break;
                 }
-                if (params.action == 'tonerinfo') {
-                    soapRequest.getTonerInfo(params.host, function (res) {
-                        response.write(res);
-                        response.end();
-                    });
-                }
+
             }
         } else {
             response.statusCode = 404;
@@ -32,6 +44,11 @@ function start(route) {
     }
 
     http.createServer(onRequest).listen(8888);
+}
+
+function onResponse(res, response) {
+    response.write(res);
+    response.end();
 }
 
 exports.start = start;

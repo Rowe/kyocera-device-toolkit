@@ -1,4 +1,7 @@
 const device_information = require('./device_information');
+const device_counter = require('./device_counter');
+const device_authentication = require('./device_authentication');
+
 const request = require('./request');
 
 function getRequestOptions(host, port, path, action) {
@@ -18,42 +21,46 @@ function getRequestOptions(host, port, path, action) {
     }
 }
 
-function getPanelInfo(host, callback) {
+function getAuthenticationStatus(host, callback){
 
+}
+
+function getDeviceInfo(host, callback) {
     const options = getRequestOptions(host, 9090, device_information.path, device_information.action);
     const postData = device_information.body;
     request.post(options, postData, function (soapBody) {
-        console.dir(soapBody);
+        callback(soapBody[0]['kmdevinfo:get_device_constitution_informationResponse'][0]['kmdevinfo:information'][0])
+    });
+}
 
-        const panelMassageContxt = soapBody[0]
-            ['kmdevinfo:get_device_constitution_informationResponse']
-            [0]
-            ['kmdevinfo:information']
-            [0]
-            ['kmdevinfo:panel_information']
-            [0]
-            ['kmdevinfo:message']
-            [0];
-        callback(JSON.stringify({panelinfo: panelMassageContxt}));
+function getDeviceCounter(host, callback) {
+    const options = getRequestOptions(host, 9090, device_counter.path, device_counter.action);
+    const postData = device_counter.body;
+    request.post(options, postData, function (soapBody) {
+        callback(JSON.stringify(soapBody[0]['kmcntinfo:get_counterResponse'][0]));
+    });
+}
+
+function getPanelInfo(host, callback) {
+    getDeviceInfo(host, function (soap) {
+        callback(JSON.stringify(soap['kmdevinfo:panel_information']));
     });
 }
 
 function getTonerInfo(host, callback) {
-    const options = getRequestOptions(host, 9090, device_information.path, device_information.action);
-    const postData = device_information.body;
-    request.post(options, postData, function (soapBody) {
-        const toners = soapBody[0]
-            ['kmdevinfo:get_device_constitution_informationResponse']
-            [0]['kmdevinfo:information']
-            [0]['kmdevinfo:toner_information'];
+    getDeviceInfo(host, function (soap) {
+        callback(JSON.stringify(soap['kmdevinfo:toner_information']));
+    });
+}
 
-        for (let i = 0; i < toners.length; i++) {
-
-        }
-        callback(JSON.stringify({tonerInfo: toners}));
-    })
+function getCassetteInfo(host, callback) {
+    getDeviceInfo(host, function (soap) {
+        callback(JSON.stringify(soap['kmdevinfo:input_information']));
+    });
 }
 
 
 exports.getPanelInfo = getPanelInfo;
 exports.getTonerInfo = getTonerInfo;
+exports.getCassetteInfo = getCassetteInfo;
+exports.getDeviceCounter = getDeviceCounter;
