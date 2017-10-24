@@ -110,5 +110,4 @@ typings/
 # dotenv environment variables file
 .env
 
-
-/wireshark_package/*
+/runtime/*

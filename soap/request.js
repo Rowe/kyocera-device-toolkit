@@ -2,15 +2,18 @@ const http = require('http');
 const https = require('https');
 const url = require('url');
 const parseString = require('xml2js').parseString;
+const fs = require('fs');
+const Log = require('log');
+const log = new Log('info', fs.createWriteStream('runtime/app.log', {flags: 'a'}));
 
 function post(options, postData, callback) {
 
-    var requestProtocal = http;
+    var reqProtocal = http;
     if (options.protocol == "https:") {
-        requestProtocal = https;
+        reqProtocal = https;
     }
 
-    const req = requestProtocal.request(options, function (res) {
+    const req = reqProtocal.request(options, function (res) {
 
         if (res.statusCode == 307) {
             //console.dir(url.parse(res.headers.location));
@@ -22,8 +25,7 @@ function post(options, postData, callback) {
             post(options, postData, callback);
             return;
         }
-
-        if (res.statusCode == 200) {
+        else if (res.statusCode == 200) {
             var responseXML = "";
 
             res.setEncoding('utf8');
@@ -31,6 +33,7 @@ function post(options, postData, callback) {
                 responseXML += chunk;
             });
             res.on('end', () => {
+                log.info(`STATUS:${res.statusCode}  HEADERS:${JSON.stringify(res.headers)}  BODY:${responseXML}`);
                 parseString(responseXML, function (err, result) {
                     const soapBody = result['SOAP-ENV:Envelope']['SOAP-ENV:Body'];
                     callback(soapBody);
@@ -38,8 +41,7 @@ function post(options, postData, callback) {
             });
         }
         else {
-            console.log(`STATUS: ${res.statusCode}`);
-            console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+            //TODO
         }
 
     });

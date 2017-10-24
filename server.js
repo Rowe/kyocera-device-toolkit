@@ -2,6 +2,9 @@ const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
 const soapRequest = require('./soap/soap_request');
+const fs = require('fs');
+const Log = require('log');
+const log = new Log('info', fs.createWriteStream('runtime/app.log', {flags: 'a'}));
 
 function start(route) {
 
@@ -9,32 +12,33 @@ function start(route) {
         if (request.method === 'GET') {
 
             var requestURL = url.parse(request.url);
-            params = querystring.parse(requestURL.query);
-
-            if (params.host != undefined) {
-                switch (params.action) {
+            const params = querystring.parse(requestURL.query);
+            const host = params.host;
+            const action = params.action;
+            if (host != undefined) {
+                switch (action) {
                     case 'panel':
-                        soapRequest.getPanelInfo(params.host, function (res) {
+                        soapRequest.getPanelInfo(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
                     case 'tonner':
-                        soapRequest.getTonerInfo(params.host, function (res) {
+                        soapRequest.getTonerInfo(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
                     case 'cassette':
-                        soapRequest.getCassetteInfo(params.host, function (res) {
+                        soapRequest.getCassetteInfo(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
                     case 'counter':
-                        soapRequest.getDeviceCounter(params.host, function (res) {
+                        soapRequest.getDeviceCounter(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
-                    case 'auth_sta':
-                        soapRequest.getAuthenticationStatus(params.host, function (res) {
+                    case 'restart':
+                        soapRequest.restart(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
@@ -42,6 +46,9 @@ function start(route) {
                         break;
                 }
 
+            } else {
+                response.statusCode = 404;
+                response.end();
             }
         } else {
             response.statusCode = 404;
@@ -50,6 +57,8 @@ function start(route) {
     }
 
     http.createServer(onRequest).listen(8888);
+
+    log.info('The server has started at the port 8888');
 }
 
 function onResponse(res, response) {
