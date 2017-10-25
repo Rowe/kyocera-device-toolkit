@@ -16,7 +16,7 @@ function post(options, postData, callback) {
     const req = reqProtocal.request(options, function (res) {
 
         if (res.statusCode == 307) {
-            //console.dir(url.parse(res.headers.location));
+
             redirectURL = url.parse(res.headers.location);
             options.host = redirectURL.hostname;
             options.port = redirectURL.port;
@@ -26,17 +26,16 @@ function post(options, postData, callback) {
             return;
         }
         else if (res.statusCode == 200) {
-            var responseXML = "";
+            var responseXML = '';
 
             res.setEncoding('utf8');
             res.on('data', (chunk) => {
                 responseXML += chunk;
             });
             res.on('end', () => {
-                log.info(`STATUS:${res.statusCode}  HEADERS:${JSON.stringify(res.headers)}  BODY:${responseXML}`);
-                parseString(responseXML, function (err, result) {
-                    const soapBody = result['SOAP-ENV:Envelope']['SOAP-ENV:Body'];
-                    callback(soapBody);
+                log.info(`RESPONSE | STATUS:${res.statusCode}  HEADERS:${JSON.stringify(res.headers)}  BODY:${responseXML}`);
+                parseString(responseXML, {explicitArray: false}, function (err, json) {
+                    callback(json['SOAP-ENV:Envelope']['SOAP-ENV:Body']);
                 });
             });
         }
@@ -51,9 +50,28 @@ function post(options, postData, callback) {
     });
 
     req.write(postData);
+    log.info(`REQUEST | OPTIONS:${JSON.stringify(options)}  BODY:${postData.replace(/\n/)}`);
 
     req.end();
 }
 
+function getRequestOptions(host, path) {
+    return {
+        host: host,
+        port: 9090,
+        method: 'POST',
+        rejectUnauthorized: false,
+        protocol: 'http:',
+        path: path,
+        headers: {
+            'Host': '' + host + ':' + 9090,
+            'Content-Type': 'application/soap+xml; charset=utf-8',
+            'Connection': 'close'
+        }
+    }
+}
+
 
 exports.post = post;
+exports.getOptions = getRequestOptions;
+

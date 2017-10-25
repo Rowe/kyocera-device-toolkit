@@ -1,16 +1,14 @@
 const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
-const soapRequest = require('./soap/soap_request');
+const api = require('./api');
 const fs = require('fs');
 const Log = require('log');
 const log = new Log('info', fs.createWriteStream('runtime/app.log', {flags: 'a'}));
 
 function start(route) {
-
     function onRequest(request, response) {
         if (request.method === 'GET') {
-
             var requestURL = url.parse(request.url);
             const params = querystring.parse(requestURL.query);
             const host = params.host;
@@ -18,27 +16,27 @@ function start(route) {
             if (host != undefined) {
                 switch (action) {
                     case 'panel':
-                        soapRequest.getPanelInfo(host, function (res) {
+                        api.getPanelInfo(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
                     case 'tonner':
-                        soapRequest.getTonerInfo(host, function (res) {
+                        api.getTonerInfo(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
                     case 'cassette':
-                        soapRequest.getCassetteInfo(host, function (res) {
+                        api.getCassetteInfo(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
                     case 'counter':
-                        soapRequest.getDeviceCounter(host, function (res) {
+                        api.getDeviceCounter(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
                     case 'restart':
-                        soapRequest.restart(host, function (res) {
+                        api.restart(host, function (res) {
                             onResponse(res, response);
                         });
                         break;
@@ -62,7 +60,7 @@ function start(route) {
 }
 
 function onResponse(res, response) {
-    response.write(res);
+    response.write(JSON.stringify(res));
     response.end();
 }
 
