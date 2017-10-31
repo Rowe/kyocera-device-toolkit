@@ -6,14 +6,14 @@ const fs = require('fs');
 const Log = require('log');
 const log = new Log('info', fs.createWriteStream('runtime/app.log', {flags: 'a'}));
 
-function start(route) {
+function start() {
     function onRequest(request, response) {
         if (request.method === 'GET') {
             var requestURL = url.parse(request.url);
             const params = querystring.parse(requestURL.query);
             const host = params.host;
             const action = params.action;
-            if (host != undefined) {
+            if (host != undefined && action != undefined) {
                 switch (action) {
                     case 'panel':
                         api.getPanelInfo(host, function (res) {
@@ -55,7 +55,6 @@ function start(route) {
     }
 
     http.createServer(onRequest).listen(8888);
-
     log.info('The server has started at the port 8888');
 }
 

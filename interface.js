@@ -1,4 +1,4 @@
-const request = require('./req');
+const request = require('./request');
 
 /**
  * get model authentication status
