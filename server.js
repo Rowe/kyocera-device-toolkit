@@ -1,7 +1,7 @@
 const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
-const api = require('./api');
+const api = require('./interface');
 const fs = require('fs');
 const Log = require('log');
 const log = new Log('info', fs.createWriteStream('runtime/app.log', {flags: 'a'}));
