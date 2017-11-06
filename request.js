@@ -2,9 +2,7 @@ const http = require('http');
 const https = require('https');
 const url = require('url');
 const parseString = require('xml2js').parseString;
-const fs = require('fs');
-const Log = require('log');
-const log = new Log('info', fs.createWriteStream('runtime/app.log', {flags: 'a'}));
+const logger = require('./logger');
 
 function post(options, postData, callback) {
 
@@ -33,24 +31,24 @@ function post(options, postData, callback) {
                 responseXML += chunk;
             });
             res.on('end', () => {
-                log.info(`RESPONSE | STATUS:${res.statusCode}  HEADERS:${JSON.stringify(res.headers)}  BODY:${responseXML}`);
+                logger.info(`RESPONSE | STATUS:${res.statusCode}  HEADERS:${JSON.stringify(res.headers)}  BODY:${responseXML}`);
                 parseString(responseXML, {explicitArray: false}, function (err, json) {
                     callback(json['SOAP-ENV:Envelope']['SOAP-ENV:Body']);
                 });
             });
         }
         else {
-            //TODO
+            logger.error(`RESPONSE | STATUS:${res.statusCode}`);
         }
 
     });
 
     req.on('error', (e) => {
-        console.error(`problem with request: ${e.message}`);
+        logger.error(`problem with request: ${e.message}`);
     });
 
     req.write(postData);
-    log.info(`REQUEST | OPTIONS:${JSON.stringify(options)}  BODY:${postData.replace(/\n/)}`);
+    logger.info(`REQUEST | OPTIONS:${JSON.stringify(options)}  BODY:${postData}`);
 
     req.end();
 }

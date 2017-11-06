@@ -34,7 +34,7 @@ http://localhost:8888/?host=10.170.80.100&action=panel
 ```
 then return,
 ```
-{"kmdevinfo:lock_status":"OFF","kmdevinfo:message":["准备打印。","安全级别低。"]}
+{"kmdevinfo:lock_status":"OFF","kmdevinfo:message":"processing"}
 ```
 
 
@@ -44,11 +44,20 @@ then return,
 The device network address including ip address or host name.
 
 ### `action`
-- `panel`: the panel messages of the device.
-- `toner`: the toner information with percentage level of the device.
-- `cassette`: the cassette information with percentage level of the device.
-- `counter`: the counter information of the device
-- `restart`: enable the device to be restarted.
+ `panel`  
+  The panel messages of the device.
+  
+`toner`  
+The toner information with percentage level of the device.
+
+ `cassette`  
+ The cassette information with percentage level of the device.
+ 
+ `counter`  
+ The counter information of the device
+ 
+ `restart`  
+To restart the device.
 
 
  

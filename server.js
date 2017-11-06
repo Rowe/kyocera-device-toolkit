@@ -2,9 +2,7 @@ const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
 const api = require('./interface');
-const fs = require('fs');
-const Log = require('log');
-const log = new Log('info', fs.createWriteStream('runtime/app.log', {flags: 'a'}));
+const logger = require('./logger');
 
 function start() {
     function onRequest(request, response) {
@@ -43,19 +41,15 @@ function start() {
                     default:
                         break;
                 }
-
-            } else {
-                response.statusCode = 404;
-                response.end();
             }
         } else {
             response.statusCode = 404;
-            response.end();
+
         }
     }
 
     http.createServer(onRequest).listen(8888);
-    log.info('The server has started at the port 8888');
+    logger.info('The server has started at the port 8888');
 }
 
 function onResponse(res, response) {
