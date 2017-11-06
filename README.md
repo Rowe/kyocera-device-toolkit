@@ -21,11 +21,11 @@ node index.js
 ```
 It is possible to send http request with port 8888 to the server.
 
-For example,
+For example, request
 ```
 http://localhost:8888/?host=10.170.80.100&action=panel
 ```
-then get the json code like,
+then return,
 ```
 {"kmdevinfo:lock_status":"OFF","kmdevinfo:message":["准备打印。","安全级别低。"]}
 ```
