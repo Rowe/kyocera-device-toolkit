@@ -39,16 +39,16 @@ then return,
 
 
 ## Request Parameters
-#### host
+### `host`
 
 The device network address including ip address or host name.
 
-#### action
-- panel – the panel messages of the device.
-- toner – the toner information with percentage level of the device.
-- cassette – the cassette information with percentage level of the device.
-- counter – the counter information of the device
-- restart - enable the device to be restarted.
+### `action`
+- `panel`: the panel messages of the device.
+- `toner`: the toner information with percentage level of the device.
+- `cassette`: the cassette information with percentage level of the device.
+- `counter`: the counter information of the device
+- `restart`: enable the device to be restarted.
 
 
  
