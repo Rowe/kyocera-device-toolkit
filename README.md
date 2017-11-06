@@ -36,7 +36,7 @@ then return,
 ```
 
 
-## Request Parameters
+## Parameters
 ### host
 
 The device network address including ip address or host name.
