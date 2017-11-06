@@ -39,11 +39,11 @@ then return,
 
 
 ## Request Parameters
-### `host`
+### host
 
 The device network address including ip address or host name.
 
-### `action`
+### action
  `panel`  
   The panel messages of the device.
   
@@ -60,5 +60,8 @@ The toner information with percentage level of the device.
 To restart the device.
 
 
+## RoadMap
+- Restful interface
+- 
  
 
