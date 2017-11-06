@@ -62,6 +62,7 @@ To restart the device.
 
 ## RoadMap
 - Restful interface
-- 
+- Http request router design
+- Usb printer support
  
 
