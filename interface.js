@@ -21,14 +21,14 @@ function getAuthenticationStatus(host, callback) {
  */
 function login(host, callback) {
     getAuthenticationStatus(host, function (response) {
-        if (response['kmauth:authentication_method'] == 'LOCAL_AUTHENTICATION') {
+        //if (response['kmauth:authentication_method'] == 'LOCAL_AUTHENTICATION') {
             const options = request.getOptions(host, '/ws/km-wsdl/security/authentication_authorization');
             const postData = '<?xml version="1.0" encoding="utf-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope" xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:ns1="http://www.kyoceramita.com/ws/km-wsdl/security/authentication_authorization"><SOAP-ENV:Header><wsa:Action SOAP-ENV:mustUnderstand="true">http://www.kyoceramita.com/ws/km-wsdl/security/authentication_authorization/login_system</wsa:Action></SOAP-ENV:Header><SOAP-ENV:Body><ns1:login_systemRequest><ns1:authentication_method>LOCAL_AUTHENTICATION</ns1:authentication_method><ns1:userid>Admin</ns1:userid><ns1:password>+nSQsKXZpas=</ns1:password></ns1:login_systemRequest></SOAP-ENV:Body></SOAP-ENV:Envelope>';
             request.post(options, postData, function (response) {
                 const token = response['kmauth:login_systemResponse']['kmauth:usertoken']['kmauth:token'];
                 callback(token);
             })
-        }
+        //}
     });
 }
 
